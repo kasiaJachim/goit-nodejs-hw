@@ -3,56 +3,81 @@ const path = require("path");
 const contactsPath = path.join(__dirname, "contacts.json");
 
 const getContacts = async () => {
-  const data = await fs.readFile(contactsPath);
-  return JSON.parse(data);
+  try {
+    const data = await fs.readFile(contactsPath);
+    return JSON.parse(data);
+  } catch (err) {
+    console.log(err.message);
+    res.status(404).json({ message: err.message });
+  }
 };
 
 const getContactById = async (contactId) => {
-  const contacts = await getContacts();
-  console.log(contacts);
-  const result = contacts.find((item) => item.id === contactId);
-  if (!result) {
-    throw new Error("Not found");
+  try {
+    const contacts = await getContacts();
+    console.log(contacts);
+    const result = contacts.find((item) => item.id === contactId);
+    if (!result) {
+      throw new Error("Not found");
+    }
+    return result;
+  } catch (err) {
+    console.log(err.message);
+    res.status(404).json({ message: err.message });
   }
-  return result;
 };
 
 const removeContact = async (contactId) => {
-  const contacts = await getContacts();
-  const index = contacts.findIndex((item) => item.id === contactId);
-  console.log(index);
-  if (index === -1) {
-    throw new Error("Not found");
+  try {
+    const contacts = await getContacts();
+    const index = contacts.findIndex((item) => item.id === contactId);
+    console.log(index);
+    if (index === -1) {
+      throw new Error("Not found");
+    }
+    const [result] = contacts.splice(index, 1);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    return result;
+  } catch (err) {
+    console.log(err.message);
+    res.status(404).json({ message: err.message });
   }
-  const [result] = contacts.splice(index, 1);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return result;
 };
 
 const addContact = async (body) => {
-  const contacts = await getContacts();
+  try {
+    const contacts = await getContacts();
 
-  contacts.push(body);
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-  return body;
+    contacts.push(body);
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+    return body;
+  } catch (err) {
+    console.log(err.message);
+    res.status(404).json({ message: err.message });
+  }
 };
 
 const updateContact = async (contactId, body) => {
-  const contacts = await getContacts();
-  const index = contacts.findIndex((item) => item.id === contactId);
+  try {
+    const contacts = await getContacts();
+    const index = contacts.findIndex((item) => item.id === contactId);
 
-  if (index === -1) {
-    throw new Error("Not found");
+    if (index === -1) {
+      throw new Error("Not found");
+    }
+
+    const updatedContact = { ...contacts[index], ...body };
+    contacts[index] = updatedContact;
+    console.log(body);
+    console.log(updatedContact);
+
+    await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
+
+    return updatedContact;
+  } catch (err) {
+    console.log(err.message);
+    res.status(404).json({ message: err.message });
   }
-
-  const updatedContact = { ...contacts[index], ...body };
-  contacts[index] = updatedContact;
-  console.log(body);
-  console.log(updatedContact);
-
-  await fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2));
-
-  return updatedContact;
 };
 
 module.exports = {
