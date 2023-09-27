@@ -1,33 +1,25 @@
 const Joi = require("joi");
 
 const createContactSchema = Joi.object({
-  name: Joi.string().required().messages({
-    "any.required": "missing required name field",
-  }),
-  email: Joi.string().email().required().messages({
-    "any.required": "missing required email field",
-  }),
+  name: Joi.string().required(),
+  email: Joi.string().email().lowercase().required(),
   phone: Joi.string()
-    .pattern(/^\+?[0-9 ()-]{3,}$/)
-    .required()
-    .messages({
-      "any.required": "missing required phone field",
-    }),
+    .regex(/^[0-9 ()-]+$/)
+    .required(),
 });
 
-const updateContactSchema = Joi.object()
-  .keys({
-    name: Joi.string(),
-    email: Joi.string().email(),
-    phone: Joi.string().pattern(/^\+?[0-9 ()-]{3,}$/),
-  })
-  .min(1)
-  .required()
-  .messages({
-    "object.min": "missing fields",
-  });
+const updateContactSchema = Joi.object({
+  name: Joi.string(),
+  email: Joi.string().email().lowercase(),
+  phone: Joi.string().regex(/^[0-9 ()-]+$/),
+}).or("name", "phone", "email");
+
+const updateStatusContactSchema = Joi.object({
+  favorite: Joi.bool().required(),
+});
 
 module.exports = {
   createContactSchema,
   updateContactSchema,
+  updateStatusContactSchema,
 };
