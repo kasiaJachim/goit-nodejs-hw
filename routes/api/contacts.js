@@ -11,25 +11,28 @@ const {
   updateStatusContactSchema,
   updateContactSchema,
 } = require("../../utils/validation/contactValidationShemas");
+const authenticate = require('../../middlewares/authenticate');
 
 const router = express.Router();
 
-router.get("/", contacts.listContacts);
+router.get("/",authenticate, contacts.listContacts);
 
-router.get("/:contactId", contacts.getContactById);
+router.get("/:contactId",authenticate, contacts.getContactById);
 
-router.post("/", addValid(createContactSchema), contacts.addContact);
+router.post("/",authenticate, addValid(createContactSchema), contacts.addContact);
 
-router.delete("/:contactId", contacts.removeContact);
+router.delete("/:contactId",authenticate, contacts.removeContact);
 
 router.put(
   "/:contactId",
+  authenticate,
   updateValid(updateContactSchema),
   contacts.updateContact
 );
 
 router.patch(
   "/:contactId/favorite",
+  authenticate,
   updateFavorite(updateStatusContactSchema),
   contacts.updateStatusContact
 );
