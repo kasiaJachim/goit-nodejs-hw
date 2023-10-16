@@ -70,6 +70,18 @@ const updateSubscriptionValid = (schema) => {
   };
 };
 
+const emailValid = (schema) => {
+  return (req, res, next) => {
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(400).json({
+        message: `Verification has already been passed`,
+      });
+    }
+    next();
+  };
+};
+
 module.exports = {
   addValid,
   updateValid,
@@ -77,4 +89,5 @@ module.exports = {
   loginValid,
   registerValid,
   updateSubscriptionValid,
+  emailValid,
 };
