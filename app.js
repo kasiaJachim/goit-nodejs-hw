@@ -6,7 +6,6 @@ require("dotenv").config();
 
 const contactsRouter = require("./routes/api/contacts");
 const authRouter = require("./routes/api/auth");
-const authenticate = require("./middlewares/authenticate");
 const app = express();
 
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
